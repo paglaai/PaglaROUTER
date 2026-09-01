@@ -19,5 +19,8 @@
     "typescript": "^5",
     "vitest": "^3",
     "wrangler": "^4"
+  },
+  "overrides": {
+    "undici": "8.9.0"
   }
 }
