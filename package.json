@@ -1,6 +1,6 @@
 {
   "name": "paglarouter",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "private": true,
   "type": "module",
   "description": "Unified LLM gateway router for the PaglaAI multi-agent ecosystem",

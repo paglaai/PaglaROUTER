@@ -14,7 +14,7 @@
 — *PaglaAI Router Team*
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-6B7EFF.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-2.6.0-8F9BFF.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.6.1-8F9BFF.svg)](CHANGELOG.md)
 [![Docs](https://img.shields.io/badge/docs-GitHub%20Pages-6B7EFF.svg)](https://paglaai.github.io/PaglaROUTER/)
 [![CI](https://github.com/paglaai/PaglaROUTER/actions/workflows/ci.yml/badge.svg)](https://github.com/paglaai/PaglaROUTER/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-59%20passed-0A0A0B.svg)](Tests/)

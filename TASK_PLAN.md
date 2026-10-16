@@ -3,7 +3,7 @@
 Execution plan for aligning PaglaROUTER's docs/branding/packaging surface with
 the LengtaMLX design system, without touching the production routing flow.
 
-**Status:** ✅ Complete — v2.6.0
+**Status:** ✅ Complete — v2.6.1
 
 ---
 
