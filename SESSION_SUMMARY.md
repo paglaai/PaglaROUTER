@@ -1,13 +1,13 @@
 # PaglaROUTER — Session Handoff
 
 Prepared: 2026-08-02 (sign-off)
-Repo: `github.com/paglagpt/PaglaROUTER` (public) · Local: `D:\PaglaAI\paglarouter` · Branch `main`
+Repo: `github.com/paglaai/PaglaROUTER` (public) · Local: `D:\PaglaAI\paglarouter` · Branch `main`
 
 ## Status
 
 **Docs site is LIVE and verified.** GitHub Pages was the long-blocked item and is
 now resolved: the docs site builds natively (no workflow) and serves at
-`https://paglagpt.github.io/PaglaROUTER/` (HTTP 200, all sub-pages + assets OK).
+`https://paglaai.github.io/PaglaROUTER/` (HTTP 200, all sub-pages + assets OK).
 
 ---
 
@@ -36,7 +36,7 @@ manual-only).
   `application/vnd.github+json`.
 - Docs Jekyll site (`docs/_config.yml`): remote theme `pages-themes/primer`,
   plugins `jekyll-remote-theme` + `jekyll-relative-links`, url
-  `https://paglagpt.github.io`, baseurl `/PaglaROUTER`. Custom override
+  `https://paglaai.github.io`, baseurl `/PaglaROUTER`. Custom override
   `docs/assets/css/style.scss` = Open Sans + `#6B7EFF` links.
 
 ## How GitHub Pages works now (the fix)

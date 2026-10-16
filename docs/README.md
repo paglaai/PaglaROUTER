@@ -26,8 +26,8 @@ permalink: /
 | [Development](development.md) | Tests, typecheck, build, and deploy |
 
 The full surface (selection weight, error taxonomy, provider matrix) also lives
-in the root [README](https://github.com/paglagpt/PaglaROUTER#readme). Source-of-truth
-modules are under [`src/`](https://github.com/paglagpt/PaglaROUTER/tree/main/src).
+in the root [README](https://github.com/paglaai/PaglaROUTER#readme). Source-of-truth
+modules are under [`src/`](https://github.com/paglaai/PaglaROUTER/tree/main/src).
 
 ## Feature map
 

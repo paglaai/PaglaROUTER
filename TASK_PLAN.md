@@ -30,15 +30,21 @@ the LengtaMLX design system, without touching the production routing flow.
 | `.github/workflows/deploy-worker.yml` | Add `npm test` step to CI | 5m | 100 | — | CI runs tests | — | CONTRIBUTING |
 | `CHANGELOG.md`, `CONTRIBUTING.md`, `.gitignore` | 2.6.0 entry, Tests/docs guidance, allow `.vscode/settings.json` | 15m | 600 | — | Entries consistent with repo | — | README |
 
+## Workstream C — Deployment prep & PaglaDESIGN portal
+
+| File | Change | Est. time | Est. tokens | Sub-agent | Success | Error | Handoff |
+| ---- | ------ | --------- | ----------- | --------- | ------- | ----- | ------- |
+| `public/index.html` | Restyle with PaglaDESIGN (Open Sans typography, `#6B7EFF` accent, `#0A0A0B` dark background, wordmark & tagline) | 15m | 1.2k | — | Renders cleanly, matches brand palette | Design drift → align with brand kit | dashboard.js |
+| `public/dashboard.js` | Live telemetry poller formatting & responsive meters | 10m | 400 | — | Live meter polling functional | Script error → fix DOM refs | index.html |
+| `wrangler.toml` | Custom domain route `router.paglaai.space/*` and KV telemetry namespace docs | 5m | 150 | — | Valid TOML syntax | Missing zone → check zone_name | deploy-worker.yml |
+| `SESSION_SUMMARY.md` | Update all legacy `paglagpt` URLs to official `paglaai` org | 5m | 200 | — | Clean links throughout | Stale links → grep | README |
+| `AGENTS.md` | Commit repository specification, routing rules, weight math & taxonomy | 10m | 600 | — | Matches worker behavior | Rule drift → sync | README |
+
 ## Not in scope (production flow)
 
-- `src/index.ts`, `src/adapters/*`, `src/types.ts`, `public/*`, `wrangler.toml`
-  are **not** modified except the `dailyWindowStart` correctness fix above.
-- Cloudflare deployment (Worker + Pages portal) is deferred until the
-  `router.paglaai.space` domain is live; both workflows are on
-  `workflow_dispatch` until then.
-- Docs are served on **GitHub Pages** (Jekyll from `docs/`). A heavier
-  Docusaurus site is not needed and would add build deps.
+- `src/index.ts`, `src/adapters/*`, `src/types.ts` are **not** modified (zero regression in production routing flow).
+- Cloudflare deployment (Worker + Pages portal) is triggered manually via `workflow_dispatch` once `router.paglaai.space` credentials are populated.
+- Docs remain served natively on **GitHub Pages** (Jekyll from `docs/`).
 
 ## Verification
 
@@ -50,5 +56,5 @@ the LengtaMLX design system, without touching the production routing flow.
   (configure-pages `TypeError`, then `jekyll-github-metadata`
   `inject_metadata!` for nil in a development-env container) was abandoned in
   favor of GitHub's own builder, which runs the same gems under production
-  env. Verified: `https://paglagpt.github.io/PaglaROUTER/` returns 200 with
+  env. Verified: `https://paglaai.github.io/PaglaROUTER/` returns 200 with
   all docs pages, stylesheet, and banner assets rendering.

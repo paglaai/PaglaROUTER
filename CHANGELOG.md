@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 - GitHub Pages docs site (`docs/` Jekyll build) live at
-  <https://paglagpt.github.io/PaglaROUTER/>. Built natively from branch `main`
+  <https://paglaai.github.io/PaglaROUTER/>. Built natively from branch `main`
   at path `/docs` (GitHub's own Pages builder), not a custom workflow.
 - `ci.yml` workflow (typecheck + tests + dry-run build) for PRs and main.
 - `CODE_OF_CONDUCT.md`, `.github/FUNDING.yml`, and Dependabot config for npm
@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   (`workflow_dispatch`) until the `router.paglaai.space` domain and Cloudflare
   project are live.
 - Brand assets moved to `docs/assets/` so the Jekyll docs site can serve them.
+- Refactored `public/index.html` explorer portal to strictly follow **PaglaDESIGN**:
+  Open Sans typography, `#6B7EFF` brand accent, `#0A0A0B` dark palette, and official
+  *Intelligence Unhinged* wordmark branding.
+- Completed organization migration from legacy `paglagpt` to `paglaai` across all
+  documentation, badges, funding, and configuration.
+- Added and committed `AGENTS.md` specifying repository conventions, Cloudflare worker
+  entrypoints, scheduler mathematics, and telemetry contracts.
 
 ## [2.6.0] - 2026-08-02
 
