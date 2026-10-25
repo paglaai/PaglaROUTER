@@ -5,6 +5,14 @@ All notable changes to PaglaROUTER are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+- Integrated shared PaglaDESIGN tokens, responsive states, and accessible
+  semantic sections into the explorer portal and documentation theme.
+- Updated the dashboard to combine the public health response with the provider
+  catalog, avoiding the removed account details from `/health`.
+
 ## [2.6.1] - 2026-10-16
 
 ### Added

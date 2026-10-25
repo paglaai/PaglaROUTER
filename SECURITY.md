@@ -9,7 +9,7 @@ Do **not** open a public issue for a security problem. Report privately to the
 maintainer (nishidhho) with a subject prefixed `[PaglaROUTER-SEC]` including:
 
 - What you found and how to reproduce it.
-- Which component is affected (`src/index.ts`, an adapter, `wrangler.toml`, …).
+- Which component is affected (`src/index.ts`, an adapter, `wrangler.jsonc`, …).
 - Any keys involved (rotate them immediately if so).
 
 You should receive a first response within 48 hours.
@@ -20,8 +20,14 @@ You should receive a first response within 48 hours.
   `*_API_KEYS` secret are gitignored. Confirm with `git ls-files | grep -i key`.
 - **Set Worker secrets, not plaintext config.** Use
   `npx wrangler secret put <NAME> --env production`.
-- **Enable `ROUTER_ADMIN_TOKEN`** in production. Without it, `/v1/*` endpoints
-  accept any caller and your keys become an open proxy for others.
+- **Configure `ROUTER_ADMIN_TOKEN`** locally and in production. It is required
+  for `/v1/*` endpoints; the router fails closed when it is missing.
+- **Configure `ROUTER_ALLOWED_ORIGINS`** as a comma-separated browser-origin
+  allowlist. If unset, the gateway emits no CORS allow-origin header; non-browser
+  API clients remain unaffected.
+- **Keep request bodies bounded.** `ROUTER_MAX_REQUEST_BYTES` defaults to 1 MiB
+  and is capped at 10 MiB by the Worker. Lower it when the supported request
+  shapes allow a smaller limit.
 - **Comma-separated keys multiply exposure.** Each key in a secret is a
   separate billable account; audit the list in `wrangler secret list`.
 - **Rotate on lockout.** The router permanently locks out (`H = 0`) keys that

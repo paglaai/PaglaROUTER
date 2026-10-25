@@ -193,15 +193,16 @@ Set Worker secrets first (each may hold comma-separated multi-account keys):
 npx wrangler secret put GEMINI_API_KEY --env production
 npx wrangler secret put GROQ_API_KEY --env production
 # ... QWEN_API_KEY, KIMI_API_KEY, GITHUB_TOKEN, CEREBRAS_API_KEY, MISTRAL_API_KEY, OPENROUTER_API_KEY
-npx wrangler secret put ROUTER_ADMIN_TOKEN --env production   # optional auth
-```
+npx wrangler secret put ROUTER_ADMIN_TOKEN --env production   # required auth
+}
 
-> `wrangler.toml` references KV id `a1b2c3d4e5f6_pagla_kv`. Create the real
-> namespace and paste its id:
-> `npx wrangler kv namespace create PAGLA_TELEMETRY_KV`
+`wrangler.jsonc` contains the dedicated `PAGLA_TELEMETRY_KV` binding for the
+PaglaROUTER telemetry namespace. Configure the `router.paglaai.space` custom
+domain and route in the connected Cloudflare Worker settings before exposing
+the endpoint publicly.
 
-Once `paglaai.space` NameServers propagate, `https://router.paglaai.space/v1`
-activates automatically via the custom-domain route.
+After the custom domain is active, `https://router.paglaai.space/v1` becomes
+the public API base URL.
 
 ## Usage
 

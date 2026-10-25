@@ -37,6 +37,41 @@ import { kimiTransformRequest } from "./adapters/kimi";
 
 type AppContext = Context<{ Bindings: Env }>;
 
+const DEFAULT_MAX_REQUEST_BYTES = 1_048_576;
+const ABSOLUTE_MAX_REQUEST_BYTES = 10 * 1_048_576;
+
+function unauthorizedResponse(): Response {
+  return errorJson(401, "Missing or invalid ROUTER_ADMIN_TOKEN.", "unauthorized");
+}
+
+function allowedOrigins(env: Env): Set<string> {
+  return new Set(
+    (env.ROUTER_ALLOWED_ORIGINS ?? "")
+      .split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean),
+  );
+}
+
+function maxRequestBytes(env: Env): number {
+  const configured = Number(env.ROUTER_MAX_REQUEST_BYTES);
+  if (!Number.isSafeInteger(configured) || configured <= 0) return DEFAULT_MAX_REQUEST_BYTES;
+  return Math.min(configured, ABSOLUTE_MAX_REQUEST_BYTES);
+}
+
+async function requestExceedsLimit(c: AppContext): Promise<boolean> {
+  if (c.req.method === "GET" || c.req.method === "HEAD") return false;
+  const limit = maxRequestBytes(c.env);
+  const contentLength = Number(c.req.header("content-length"));
+  if (Number.isFinite(contentLength) && contentLength > limit) return true;
+  const body = await c.req.raw.clone().arrayBuffer();
+  return body.byteLength > limit;
+}
+
+function requestTooLargeResponse(): Response {
+  return errorJson(413, "Request body exceeds the configured maximum size.", "request_too_large");
+}
+
 /* ------------------------------------------------------------------ */
 /* Provider dispatch                                                    */
 /* ------------------------------------------------------------------ */
@@ -312,14 +347,31 @@ function chatToAnthropic(cr: ChatResponse, model: string): AnthropicResponse {
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.use("*", cors({ origin: "*", allowHeaders: ["Content-Type", "Authorization"], allowMethods: ["POST", "GET", "OPTIONS"] }));
+app.use(
+  "*",
+  cors({
+    origin: (origin, c) => {
+      if (!origin) return undefined;
+      return allowedOrigins(c.env).has(origin) ? origin : undefined;
+    },
+    allowHeaders: ["Content-Type", "Authorization"],
+    allowMethods: ["POST", "GET", "OPTIONS"],
+  }),
+);
 
 function checkAdmin(c: AppContext): boolean {
-  const expected = c.env.ROUTER_ADMIN_TOKEN;
-  if (!expected) return true;
+  const expected = c.env.ROUTER_ADMIN_TOKEN?.trim();
+  if (!expected) return false;
   const header = c.req.header("authorization") ?? "";
   return header === `Bearer ${expected}`;
 }
+
+app.use("/v1/*", async (c: AppContext, next) => {
+  if (c.req.method === "OPTIONS") return next();
+  if (!checkAdmin(c)) return unauthorizedResponse();
+  if (await requestExceedsLimit(c)) return requestTooLargeResponse();
+  await next();
+});
 
 app.get("/", (c: AppContext) => {
   const providers = Object.values(PROVIDERS).map((p) => ({
@@ -338,7 +390,6 @@ app.get("/health", (c: AppContext) => {
     ok: true,
     ts: Date.now(),
     configured: accounts.length > 0,
-    accounts: accounts.map((a) => a.accountId),
   });
 });
 
@@ -348,7 +399,6 @@ app.get("/v1/models", (c: AppContext) => {
 });
 
 app.post("/v1/chat/completions", async (c: AppContext) => {
-  if (!checkAdmin(c)) return errorJson(401, "Missing or invalid ROUTER_ADMIN_TOKEN.", "unauthorized");
   const request = (await c.req.json().catch(() => null)) as ChatRequest | null;
   if (!request || !Array.isArray(request.messages) || request.messages.length === 0) {
     return errorJson(400, "Request body must include a non-empty `messages` array.", "invalid_request");
@@ -357,7 +407,6 @@ app.post("/v1/chat/completions", async (c: AppContext) => {
 });
 
 app.post("/v1/messages", async (c: AppContext) => {
-  if (!checkAdmin(c)) return errorJson(401, "Missing or invalid ROUTER_ADMIN_TOKEN.", "unauthorized");
   const ar = (await c.req.json().catch(() => null)) as AnthropicRequest | null;
   if (!ar || !Array.isArray(ar.messages) || ar.messages.length === 0 || !ar.max_tokens) {
     return errorJson(400, "Request body must include `messages` and `max_tokens`.", "invalid_request");

@@ -9,24 +9,29 @@
     status.className = "badge " + (ok ? "ok" : "down");
   }
 
-  function render(health) {
-    if (!health || !health.providers) return;
+  function render(catalog, health) {
+    if (!catalog || !Array.isArray(catalog.providers)) return;
     grid.innerHTML = "";
     const pct = (v, max) => Math.max(0, Math.min(100, Math.round((v / Math.max(1, max)) * 100)));
 
-    for (const p of health.providers) {
+    for (const p of catalog.providers) {
       const q = p.quota || {};
-      const live = p.healthy !== false;
+      const live = health?.ok === true;
       const card = document.createElement("div");
       card.className = "card";
 
       const title = document.createElement("h3");
-      title.innerHTML = `<span>${p.label}</span><span class="${live ? "live" : "dead"}">${live ? "LIVE" : "DOWN"}</span>`;
+      const label = document.createElement("span");
+      label.textContent = p.label || p.id || "Provider";
+      const state = document.createElement("span");
+      state.className = live ? "live" : "dead";
+      state.textContent = live ? "LIVE" : "DOWN";
+      title.append(label, state);
       card.appendChild(title);
 
       const statusLine = document.createElement("div");
       statusLine.className = "status";
-      statusLine.textContent = `model: ${p.default_model || "—"}  ·  reset: ${q.reset || "—"}`;
+      statusLine.textContent = `model: ${p.default_model || "—"}  ·  reset: ${q.reset || "—"}  ·  configured: ${health?.configured ? "yes" : "no"}`;
       card.appendChild(statusLine);
 
       const rows = [
@@ -57,11 +62,14 @@
 
   async function poll() {
     try {
-      const res = await fetch("/health", { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error("health check failed");
-      const data = await res.json();
-      setStatus(data.ok === true);
-      render(data);
+      const [healthRes, catalogRes] = await Promise.all([
+        fetch("/health", { headers: { Accept: "application/json" } }),
+        fetch("/", { headers: { Accept: "application/json" } }),
+      ]);
+      if (!healthRes.ok || !catalogRes.ok) throw new Error("gateway check failed");
+      const [health, catalog] = await Promise.all([healthRes.json(), catalogRes.json()]);
+      setStatus(health.ok === true);
+      render(catalog, health);
     } catch {
       setStatus(false);
       grid.innerHTML = `<div class="card mono">Gateway unreachable — is the Worker deployed to router.paglaai.space?</div>`;

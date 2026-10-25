@@ -70,6 +70,6 @@ npx wrangler secret put ROUTER_ADMIN_TOKEN --env production
 npx wrangler deploy --env production
 ```
 
-`wrangler.toml` references KV id `a1b2c3d4e5f6_pagla_kv` — create the real
-namespace with `npx wrangler kv namespace create PAGLA_TELEMETRY_KV` and paste
-its id before deploying.
+`wrangler.jsonc` contains the dedicated PaglaROUTER telemetry KV binding.
+Configure the `router.paglaai.space` custom domain and route in the connected
+Cloudflare Worker settings before exposing the production endpoint.

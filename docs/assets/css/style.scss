@@ -4,6 +4,10 @@
 @import "{{ site.theme }}";
 
 $font-sans: "Open Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+$pagla-ink: #0a0a0b;
+$pagla-violet: #6b7eff;
+$pagla-violet-bright: #8f9bff;
+$pagla-line: #1f2b45;
 
 body,
 .markdown-body,
@@ -23,13 +27,21 @@ body,
   font-family: $font-sans;
 }
 
+body {
+  background: $pagla-ink;
+}
+
 .markdown-body a,
 .site-header a {
-  color: #6b7eff;
+  color: $pagla-violet;
 }
 .markdown-body a:hover,
 .site-header a:hover {
-  color: #8f9bff;
+  color: $pagla-violet-bright;
+}
+
+.site-header {
+  border-bottom-color: $pagla-line;
 }
 
 .markdown-body code,

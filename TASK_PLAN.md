@@ -36,7 +36,7 @@ the LengtaMLX design system, without touching the production routing flow.
 | ---- | ------ | --------- | ----------- | --------- | ------- | ----- | ------- |
 | `public/index.html` | Restyle with PaglaDESIGN (Open Sans typography, `#6B7EFF` accent, `#0A0A0B` dark background, wordmark & tagline) | 15m | 1.2k | — | Renders cleanly, matches brand palette | Design drift → align with brand kit | dashboard.js |
 | `public/dashboard.js` | Live telemetry poller formatting & responsive meters | 10m | 400 | — | Live meter polling functional | Script error → fix DOM refs | index.html |
-| `wrangler.toml` | Custom domain route `router.paglaai.space/*` and KV telemetry namespace docs | 5m | 150 | — | Valid TOML syntax | Missing zone → check zone_name | deploy-worker.yml |
+| `wrangler.jsonc` | Worker entrypoint, production environment, and dedicated KV telemetry binding | 5m | 150 | — | Valid JSONC syntax | Binding/config error → verify Cloudflare Worker settings | deploy-worker.yml |
 | `SESSION_SUMMARY.md` | Update all legacy `paglagpt` URLs to official `paglaai` org | 5m | 200 | — | Clean links throughout | Stale links → grep | README |
 | `AGENTS.md` | Commit repository specification, routing rules, weight math & taxonomy | 10m | 600 | — | Matches worker behavior | Rule drift → sync | README |
 

@@ -26,6 +26,11 @@ GEMINI_API_KEY=
 # MISTRAL_API_KEYS=
 # OPENROUTER_API_KEYS=
 
-# Optional auth gate for /v1/* endpoints. Set in production to prevent the
-# router from being used as an open proxy.
-# ROUTER_ADMIN_TOKEN=
+# Authentication for /v1/* endpoints is fail-closed. Set this in local
+# development and production to prevent the router from being an open proxy.
+ROUTER_ADMIN_TOKEN=
+# Optional comma-separated browser origins. If unset, the gateway sends no
+# CORS allow-origin header; non-browser API clients remain unaffected.
+# ROUTER_ALLOWED_ORIGINS=https://kolpona.paglaai.space,https://paglaai.space
+# Maximum JSON request body size in bytes. Defaults to 1048576 (1 MiB).
+# ROUTER_MAX_REQUEST_BYTES=1048576

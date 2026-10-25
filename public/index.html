@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-design="pagla">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./pagla-design.css">
   <style>
     :root {
       --bg: #0a0a0b;
@@ -184,37 +185,45 @@
 <body>
   <div class="wrap">
     <header class="brand-header">
+      <div class="eyebrow">PaglaAI · Edge Intelligence</div>
       <div class="title-row">
         <h1>Pagla<span>ROUTER</span></h1>
-        <span id="gw-status" class="badge down">OFFLINE</span>
+        <span id="gw-status" class="badge down" aria-live="polite">OFFLINE</span>
       </div>
       <div class="accent-bar"></div>
       <p class="sub">Unified LLM Gateway · Weight-selected multi-provider routing · Dual-interface (OpenAI + Anthropic)</p>
       <div class="tagline">Intelligence Unhinged</div>
+      <div class="metric-strip" aria-label="Gateway summary">
+        <div class="metric"><span class="metric-label">Runtime</span><span class="metric-value">Cloudflare Worker</span></div>
+        <div class="metric"><span class="metric-label">Protocols</span><span class="metric-value">OpenAI + Anthropic</span></div>
+        <div class="metric"><span class="metric-label">Routing</span><span class="metric-value">Quota-aware cascade</span></div>
+      </div>
     </header>
 
-    <section class="section">
-      <h2>Provider Health &amp; Quota Telemetry</h2>
+    <main>
+    <section class="section" aria-labelledby="provider-heading">
+      <h2 id="provider-heading">Provider Health &amp; Quota Telemetry</h2>
       <div class="grid" id="providers"><div class="card mono">Waiting for gateway…</div></div>
     </section>
 
-    <section class="section">
-      <h2>Gateway Endpoints</h2>
-      <div class="card mono">
-        <div>POST <code>router.paglaai.space/v1/chat/completions</code> · OpenAI-compatible</div>
-        <div>POST <code>router.paglaai.space/v1/messages</code> · Anthropic-compatible</div>
-        <div>GET&nbsp; <code>router.paglaai.space/v1/models</code> · model catalog</div>
-        <div>GET&nbsp; <code>router.paglaai.space/health</code> · liveness + configured accounts</div>
+    <section class="section" aria-labelledby="endpoint-heading">
+      <h2 id="endpoint-heading">Gateway Endpoints</h2>
+      <div class="card mono endpoint-card">
+        <div class="endpoint-row"><span class="endpoint-method">POST</span><span><code>router.paglaai.space/v1/chat/completions</code> · OpenAI-compatible</span></div>
+        <div class="endpoint-row"><span class="endpoint-method">POST</span><span><code>router.paglaai.space/v1/messages</code> · Anthropic-compatible</span></div>
+        <div class="endpoint-row"><span class="endpoint-method">GET</span><span><code>router.paglaai.space/v1/models</code> · model catalog</span></div>
+        <div class="endpoint-row"><span class="endpoint-method">GET</span><span><code>router.paglaai.space/health</code> · public liveness</span></div>
       </div>
     </section>
 
-    <section class="section">
-      <h2>Selection Weight Algorithm</h2>
+    <section class="section" aria-labelledby="weight-heading">
+      <h2 id="weight-heading">Selection Weight Algorithm</h2>
       <div class="card mono">
         <div>W(A<sub>i</sub>,M) = H·S·(α·R<sub>rpm</sub>/L<sub>rpm</sub> + β·R<sub>tpm</sub>/L<sub>tpm</sub> + γ·R<sub>rpd</sub>/L<sub>rpd</sub>) · 1/(1+C)</div>
         <div style="margin-top:8px">α=0.3 · β=0.4 · γ=0.3 &nbsp;·&nbsp; 429 → quarantine/requeue · 401/403 → H=0 · 5xx → breaker S</div>
       </div>
     </section>
+    </main>
 
     <footer>
       <div>PaglaROUTER · built for the <a href="https://github.com/paglaai" target="_blank" rel="noopener">PaglaAI</a> ecosystem · <span class="tagline">Intelligence Unhinged</span></div>

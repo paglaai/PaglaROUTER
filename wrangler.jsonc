@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "paglarouter",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "kv_namespaces": [
+    {
+      "binding": "PAGLA_TELEMETRY_KV",
+      "id": "a71ad0e7a97c48cabebd37216a4a5577"
+    }
+  ],
+  "env": {
+    "production": {
+      "name": "paglarouter",
+      "kv_namespaces": [
+        {
+          "binding": "PAGLA_TELEMETRY_KV",
+          "id": "a71ad0e7a97c48cabebd37216a4a5577"
+        }
+      ]
+    }
+  }
+}

@@ -20,6 +20,8 @@ export interface Env {
   MISTRAL_API_KEYS?: string;
   OPENROUTER_API_KEYS?: string;
   ROUTER_ADMIN_TOKEN?: string;
+  ROUTER_ALLOWED_ORIGINS?: string;
+  ROUTER_MAX_REQUEST_BYTES?: string;
 }
 
 export type ResetZone = "utc-midnight" | "rolling" | "pacific-midnight" | "cst-midnight";

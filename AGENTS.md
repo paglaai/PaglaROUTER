@@ -31,9 +31,11 @@ No linter/formatter configured — `strict` TS + `.editorconfig` (2-space, LF, `
 - Local: `cp .dev.vars.example .dev.vars` — `wrangler dev` loads it. Never commit `.dev.vars`/`.env` (gitignored).
 - Production: `npx wrangler secret put <NAME> --env production` per provider. Secrets accept comma-separated keys (`GEMINI_API_KEY=k1,k2` → `provider#0`, `provider#1`).
 - Canonical secret is `*_API_KEY`; `*_API_KEYS` alias (claude-code-proxy/uni-api compat) is **read-only fallback** — only used when canonical is unset (`src/config.ts:239`).
-- `ROUTER_ADMIN_TOKEN` — if set, gates `POST /v1/*` via `Authorization: Bearer <token>`; unset = open.
-- KV binding `PAGLA_TELEMETRY_KV` (`quota:<accountId>`, `state:<accountId>`). `wrangler.toml:17` placeholder `a1b2c3d4e5f6_pagla_kv` — replace via `npx wrangler kv namespace create PAGLA_TELEMETRY_KV`. Isolate-local `memCache` + `inFlight` Map — for cross-isolate consistency swap to Redis.
-- `wrangler.toml` — `compatibility_date = "2026-08-01"`, `compatibility_flags = ["nodejs_compat"]`, route `router.paglaai.space/*` zone `paglaai.space`.
+- `ROUTER_ADMIN_TOKEN` — required for all `/v1/*` routes via `Authorization: Bearer <token>`; missing or invalid tokens receive `401`.
+- `ROUTER_ALLOWED_ORIGINS` — optional comma-separated browser-origin allowlist. Unset means no CORS allow-origin header; preflight requests still pass through to the CORS handler.
+- `ROUTER_MAX_REQUEST_BYTES` — optional request-body limit in bytes. Defaults to 1 MiB and is capped at 10 MiB; oversized authenticated requests receive `413` before JSON parsing.
+- KV binding `PAGLA_TELEMETRY_KV` (`quota:<accountId>`, `state:<accountId>`) is defined in `wrangler.jsonc` and points to the dedicated PaglaROUTER telemetry namespace. Isolate-local `memCache` + `inFlight` Map — for cross-isolate consistency swap to Redis.
+- `wrangler.jsonc` — Worker entrypoint, compatibility settings, production environment, and KV binding. Configure the `router.paglaai.space` custom domain/route in the connected Cloudflare Worker settings.
 
 ## TypeScript quirks
 - `strict: true`, `verbatimModuleSyntax: true` — use `import type` for type-only imports or build fails.

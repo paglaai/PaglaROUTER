@@ -30,7 +30,7 @@ aggregate multiple accounts per provider:
 ```bash
 GEMINI_API_KEY=key1,key2
 GROQ_API_KEY=key1
-ROUTER_ADMIN_TOKEN=your-optional-token
+ROUTER_ADMIN_TOKEN=your-router-token
 ```
 
 ## Run the dev server
@@ -49,6 +49,7 @@ OpenAI-compatible:
 ```bash
 curl http://localhost:8787/v1/chat/completions \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-router-token" \
   -d '{ "model": "gemini-2.5-flash",
         "messages": [{ "role": "user", "content": "hi" }] }'
 ```
@@ -58,6 +59,7 @@ Anthropic-compatible:
 ```bash
 curl http://localhost:8787/v1/messages \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-router-token" \
   -d '{ "model": "gemini-2.5-flash", "max_tokens": 256,
         "messages": [{ "role": "user", "content": "hi" }] }'
 ```
