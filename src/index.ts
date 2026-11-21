@@ -314,11 +314,21 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.use("*", cors({ origin: "*", allowHeaders: ["Content-Type", "Authorization"], allowMethods: ["POST", "GET", "OPTIONS"] }));
 
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 function checkAdmin(c: AppContext): boolean {
   const expected = c.env.ROUTER_ADMIN_TOKEN;
-  if (!expected) return true;
+  if (!expected) return false;
   const header = c.req.header("authorization") ?? "";
-  return header === `Bearer ${expected}`;
+  const target = `Bearer ${expected}`;
+  return timingSafeEqual(header, target);
 }
 
 app.get("/", (c: AppContext) => {
