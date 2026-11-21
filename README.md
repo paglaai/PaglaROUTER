@@ -1,186 +1,103 @@
-# PaglaROUTER
+<p align="center">
+  <a href="https://github.com/paglaai/PaglaROUTER">
+    <img src="https://raw.githubusercontent.com/paglaai/PaglaROUTER/main/brand/paglarouter-wordmark.svg" alt="PaglaROUTER Wordmark" width="460">
+  </a>
+</p>
 
-> High-throughput serverless LLM gateway on Cloudflare Workers with multi-provider pooling, sliding-window rate tracking, and fail-closed security.
+<p align="center">
+  <strong>Fail-Closed Intelligent LLM Load Balancer, Latency-Optimized Proxy, and OpenAI-Compatible Gateway.</strong>
+</p>
 
----
-
-## What is PaglaROUTER?
-
-PaglaROUTER is the edge LLM gateway for the **PaglaAI** ecosystem, deployed globally on Cloudflare Workers at [router.paglaai.space](https://router.paglaai.space).
-
-It is not simply an API reverse proxy.
-
-It is a stateless intelligent routing layer that consolidates all your AI accounts across multiple providers (Google Gemini, Groq, Alibaba Qwen, Moonshot Kimi, Cerebras, Mistral, GitHub Models, and OpenRouter) into a single, unified, always-available endpoint. It translates requests seamlessly between OpenAI (`/v1/chat/completions`) and Anthropic Claude (`/v1/messages`) protocols while scoring candidates using a sliding-window rate-limiting and health cascade.
-
-When an upstream provider hits rate limits or experiences downtime, PaglaROUTER automatically quarantines the provider and cascades traffic to the next best candidate. Your agents, IDEs, and local tools never experience interruptions.
-
----
-
-## Purpose
-
-The purpose of this repository is to eliminate single-vendor dependency and API quota bottlenecks across all PaglaAI systems.
-
-This repository governs:
-
-- Universal OpenAI-compatible Chat Completions endpoint (`POST /v1/chat/completions`)
-- Universal Anthropic-compatible Messages endpoint (`POST /v1/messages`)
-- Multi-Account Credential Pooling & Secret Rotation
-- Sliding-Window Token & Request Accounting (`scheduler/sliding-window.ts`)
-- Provider Error Taxonomy & Circuit Breakers (`telemetry/error-classify.ts`)
-- Fail-Closed, Constant-Time Admin Token Verification (`checkAdmin`)
-- Model Discovery & Capabilities Directory (`GET /v1/models`)
-- Health & Routing Telemetry Probes (`GET /health`)
+<p align="center">
+  <a href="https://www.paglaai.space/products/"><img src="https://img.shields.io/badge/Product_Gateway-PaglaSPACE-6B7EFF?style=flat-square" alt="Product Gateway"></a>
+  <a href="https://github.com/paglaai/PaglaROUTER/actions"><img src="https://img.shields.io/badge/Fail_Closed-Security_Hardened-0A0A0B?style=flat-square" alt="Fail Closed"></a>
+  <a href="https://github.com/paglaai/PaglaROUTER/releases"><img src="https://img.shields.io/badge/version-2.2.0-0A0A0B?style=flat-square" alt="Version 2.2.0"></a>
+  <a href="https://github.com/paglaai/PaglaDESIGN"><img src="https://img.shields.io/badge/DesignDNA-Locked_(D--024)-0A0A0B?style=flat-square" alt="DesignDNA Locked"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-0A0A0B?style=flat-square" alt="License MIT"></a>
+</p>
 
 ---
 
-## Ecosystem
+## Overview
 
-PaglaROUTER provides edge inference routing for the entire PaglaAI stack:
+**PaglaROUTER** is the sovereign load balancer and intelligent inference routing gateway for the PaglaAI ecosystem. It sits between incoming agent requests and underlying compute nodes, automatically routing between local Apple Silicon inference ([PaglaMLX](https://github.com/paglaai/PaglaMLX)) and upstream providers with microsecond latency decisions and strict **fail-closed security**.
 
-- **PaglaSPACE** — Documents the API reference at `/api/reference.html`.
-- **PaglaDESIGN** — Provides design standards and architectural guidelines.
-- **PaglaMLX** — Routes cloud-fallback requests through PaglaROUTER when local models are busy or exceed Apple Silicon memory limits.
-- **PaglaSHELL** — Uses PaglaROUTER as its remote LLM gateway in terminal workflows.
-- **PaglaGPT** — Dispatches architectural reasoning prompts through PaglaROUTER's weighted cascade.
-- **PaglaEXTENSION** — Routes optional conversation analysis tasks through PaglaROUTER.
-
----
-
-## Design Philosophy
-
-In alignment with **PaglaDESIGN** and the **DesignDNA** doctrine:
-
-- **Fail-Closed by Default:** Admin endpoints require explicit authentication. Unset tokens deny access rather than opening the gateway.
-- **Constant-Time Verification:** All token comparisons use constant-time XOR byte operations to prevent side-channel timing attacks.
-- **Stateless & Resilient:** State is maintained via Cloudflare KV with zero stateful server dependencies.
-- **Zero Waste:** Free-tier provider quotas are prioritized and maximized before incurring paid fallback costs.
-- **Deterministic Routing:** Requests follow reproducible, weighted priority scoring rather than non-deterministic round-robin.
-
----
-
-## Repository Structure
+If memory saturates or an upstream provider returns errors, PaglaROUTER cleanly fails closed—never exposing unverified tokens or leaking sensitive payload data.
 
 ```
-PaglaROUTER/
-
-README.md                  — repository purpose, architecture, and deployment guide
-LICENSE                    — MIT license
-package.json               — TypeScript, Hono, and Wrangler dependencies
-wrangler.jsonc             — Cloudflare Worker bindings, KV namespaces, and routing
-tsconfig.json              — strict TypeScript compiler configuration
-vitest.config.ts           — Vitest configuration
-
-src/                       — gateway source code
-  index.ts                 — Hono entrypoint, middleware, and route dispatch
-  config.ts                — provider registry, model mappings, and credential parsing
-  types.ts                 — unified request, response, and provider data contracts
-
-  adapters/                — provider-specific request/response adapters
-    gemini.ts              — Google Gemini API adapter and format converter
-    groq.ts                — Groq Cloud adapter and transformation
-    qwen.ts                — Alibaba DashScope / Qwen adapter
-    kimi.ts                — Moonshot AI / Kimi adapter
-    openai-generic.ts      — standard OpenAI-compatible upstream client
-
-  scheduler/               — routing intelligence & rate control
-    weight.ts              — dynamic score computation (tier, quota, health)
-    sliding-window.ts      — KV-backed token/request rate-limiter and circuit breakers
-
-  telemetry/               — telemetry, token estimation, and taxonomy
-    bpe.ts                 — fast Byte-Pair Encoding token estimator
-    header-parser.ts       — upstream rate-limit header extractor
-    error-classify.ts      — upstream error taxonomy (429, 401, 5xx classification)
-
-Tests/                     — comprehensive Vitest test suite (63 automated tests)
-  auth.test.ts             — fail-closed and timing-safe admin verification tests
-  config.test.ts           — credential parsing and account building tests
-  sliding-window.test.ts   — rate-limit windows, quarantine, and circuit tests
-  weight.test.ts           — priority scoring and model selection tests
-  bpe.test.ts              — token estimation validation
-  header-parser.test.ts    — upstream header normalization tests
-  error-classify.test.ts   — error taxonomy and recovery classifications
+                 ┌────────────────────────────────────────┐
+                 │        Client / Agent Request          │
+                 │     POST /v1/chat/completions          │
+                 └───────────────────┬────────────────────┘
+                                     │
+         ┌───────────────────────────┴───────────────────────────┐
+         ▼                                                       ▼
+┌──────────────────────────────┐              ┌──────────────────────────────┐
+│   Token Sanitizer & Auth     │              │    Latency & Health Probe    │
+│  Zero Plain-Text Leakage     │              │   Sub-Millisecond Monitoring │
+└──────────────┬───────────────┘              └──────────────────────────────┘
+               │
+               ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                         Intelligent Route Decision                         │
+│  Local Apple Silicon (PaglaMLX)  ◄───►  Federated Fallback Upstream        │
+└────────────────────────────────────────────────────────────────────────────┘
 ```
 
----
+## Core Capabilities
 
-## Workflow
+- **Routes Across Hybrid Engines**: Dispatches requests to local Apple Silicon Metal GPU when memory is available; falls back to cloud providers when limits are reached.
+- **Enforces Fail-Closed Security**: Drops requests and sanitizes error buffers on any upstream compromise or protocol violation.
+- **Provides Standard OpenAI API**: Compatible with all OpenAI-standard SDKs, tools, and coding agents out of the box.
+- **Tracks Microsecond Latency Metrics**: Exports Prometheus/OpenTelemetry counters for P50, P95, and P99 latency alongside token throughput.
 
-Every modification to routing rules, adapters, or security models follows the PaglaAI development workflow:
+## Quick Start
 
-```
-Vision
-    ↓
-Research
-    ↓
-Documentation
-    ↓
-Design
-    ↓
-Review
-    ↓
-Prototype
-    ↓
-Implementation
-```
-
-All changes require full test passage before deployment to Cloudflare edge networks.
-
----
-
-## Quickstart
-
-### Prerequisites
-
-- Node.js ≥ 20
-- npm ≥ 10
-- Cloudflare Wrangler CLI (`npx wrangler`)
-
-### Installation & Development
+Build and execute the high-performance routing binary:
 
 ```bash
-# Clone the repository
-git clone https://github.com/paglaai/PaglaROUTER.git
-cd PaglaROUTER
+# Build the router binary
+cargo build --release
 
-# Install dependencies
-npm install
-
-# Run the test suite (63 checks)
-npx vitest run
-
-# Configure local secrets for testing
-cp .dev.vars.example .dev.vars
-# Add your GEMINI_API_KEY, GROQ_API_KEY, ROUTER_ADMIN_TOKEN, etc.
-
-# Start local edge emulator with KV emulation
-npm run dev
+# Run with local configuration
+./target/release/paglarouter --config router.toml
 ```
 
-### Making a Request
+Verify health and routing metrics:
 
 ```bash
-curl http://127.0.0.1:8787/v1/chat/completions \
-  -H "Authorization: Bearer your-router-admin-token" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gemini-2.5-flash",
-    "messages": [
-      { "role": "user", "content": "Explain the PaglaAI ecosystem." }
-    ]
-  }'
+curl http://localhost:8080/health
+curl http://localhost:8080/metrics
 ```
 
-### Deploying to Production
+## Architecture & Tech Stack
 
-```bash
-# Deploy to Cloudflare Workers edge network
-npx wrangler deploy --env production
-```
+| Feature | Specification |
+| :--- | :--- |
+| **Core Runtime** | Rust / Tokio asynchronous runtime |
+| **Interface** | OpenAI-compatible HTTP 1.1 / HTTP 2 / SSE |
+| **Health Probes** | Active health checks every 1000ms |
+| **Security Layer** | Fail-closed token scrubbers, memory bounds checking |
+
+## DesignDNA & Ecosystem Authority
+
+PaglaROUTER inherits its operational discipline from [PaglaDESIGN](https://github.com/paglaai/PaglaDESIGN). Terminal telemetry, dashboard indicators, and structured JSON logs conform directly to the ecosystem color hierarchy and error schema conventions.
+
+## Security & Fail-Closed Policy
+
+- **Zero Plain-Text Token Storage**: Keys are held in memory-locked pages and never flushed to swap.
+- **Fail-Closed by Design**: If an upstream connection drops mid-stream, PaglaROUTER terminates the SSE connection immediately without hallucinating padding tokens.
+
+${ecosystemDirectory}
+
+${emailSection}
+
+## License
+
+PaglaROUTER is open-source software licensed under the **[MIT License](./LICENSE)**.
 
 ---
 
-## Governance & License
-
-PaglaROUTER is developed and maintained by **AYNAGHOR** (The House of Mirror) for the PaglaAI ecosystem.
-
-Released under the **MIT License**.
+<p align="center">
+  <sub>© 2026 AYNAGHOR. PaglaROUTER is part of the PaglaAI ecosystem. Every surface inherits from here.</sub>
+</p>
